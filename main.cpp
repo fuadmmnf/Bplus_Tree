@@ -97,7 +97,7 @@ void BTreeInsertNonFull(node *x, int key)
 			if(key > x[0].key[n])
 				n++;
 		}
-		BTreeInsertNonFull(x[0].child[n], key);
+		BTreeInsertNonFull(createNode(), key);
 	} 
 }
 
