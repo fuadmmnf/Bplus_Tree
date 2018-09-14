@@ -97,7 +97,7 @@ void BTreeInsertNonFull(node *x, int key)
 			if(key > x[0].key[n])
 				n++;
 		}
-		BTreeInsertNonFull(createNode(), key);
+		BTreeInsertNonFull(x[0].child[n], key);
 	} 
 }
 
@@ -139,7 +139,7 @@ pair<node*, int> searchKey(node* x, int key)
 	if(!x[0].isLeaf)
 		searchKey(x[0].child[i],key);
 
-	return make_pair(new node[1],-1);
+	return make_pair(createNode(),-1);
 }
 
 
