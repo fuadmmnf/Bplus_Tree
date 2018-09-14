@@ -9,8 +9,9 @@ struct node
 	node **child;
 	bool isLeaf;
 	int keyCount;
-}
+};
 
+int t;
 node *root;
 
 
@@ -56,11 +57,15 @@ void BTreeSplitChild(node *x, int iter, node *y)
 
 	for(int i = x[0].keyCount; i > iter; i--)
 		x[0].key[i+1] = x[0].key[i];
-	x[0].key[i] = y[0].key[t];
+	x[0].key[iter] = y[0].key[t];
 
 	x[0].keyCount ++;
 
 }
+
+
+
+
 
 
 
@@ -78,7 +83,7 @@ void BTreeInsertNonFull(node *x, int key)
 			n--;
 		}
 		x[0].key[n+1] = key;
-		x[0].keyCount++:	
+		x[0].keyCount++;
 	}
 	else
 	{
@@ -86,15 +91,18 @@ void BTreeInsertNonFull(node *x, int key)
 			n--;
 		n++;
 
-		if(x[0].child[n].keyCount == 2*t-1)
+		if((x[0].child[n])[0].keyCount == 2*t-1)
 		{
 			BTreeSplitChild(x, n, x[0].child[n]);
 			if(key > x[0].key[n])
 				n++;
 		}
 		BTreeInsertNonFull(x[0].child[n], key);
-	}
+	} 
 }
+
+
+
 
 
 
@@ -102,7 +110,7 @@ void BTreeInsert(int key)
 {
 	node *tempRoot = root;
 
-	if(tempRoot[0].keyCount == 2t-1)
+	if(tempRoot[0].keyCount == 2*t-1)
 	{
 		node *tempNode = createNode();
 		root = tempNode;
@@ -117,8 +125,53 @@ void BTreeInsert(int key)
 }
 
 
-int main()
+
+pair<node*, int> searchKey(node* x, int key)
+{
+	int i=0;
+
+	while(i < x[0].keyCount  &&  key > x[0].key[i])
+		i++;
+
+	if(i < x[0].keyCount  &&  key == x[0].key[i]) 
+		return make_pair(x,i);
+
+	if(!x[0].isLeaf)
+		searchKey(x[0].child[i],key);
+
+	return make_pair(new node[1],-1);
+}
+
+
+
+void printTree()
 {
 
+}
+
+
+
+
+int main()
+{
+	int n;
+	int temp;
+
+	cout<<"Please enter the value of t: ";
+	cin>>t;
+
 	root = createNode();
+
+	cout<<"Enter number of input: ";
+	cin>>n;
+	printf("\n\n\n\n");
+	for(int i=0; i<n; i++)
+	{
+		cin>>temp;
+		BTreeInsert(temp);
+		printTree();
+		printf("\n\n\n\n");
+	}
+
+	return 0;
 }
