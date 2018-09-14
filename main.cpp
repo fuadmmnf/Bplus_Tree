@@ -19,7 +19,8 @@ node* createNode()
 	node *tempNode = new node[1];
 	tempNode[0].isLeaf = true;
 	tempNode[0].keyCount = 0;
-
+	tempNode[0].key = new int[2*t-1];
+	tempNode[0].child = new node*[2*t];
 	return tempNode;
 }
 
@@ -65,6 +66,23 @@ void BTreeSplitChild(node *x, int iter, node *y)
 
 
 
+void BTreeInsert(int key)
+{
+	node *tempRoot = root;
+
+	if(tempRoot[0].keyCount == 2t-1)
+	{
+		node *tempNode = createNode();
+		root = tempNode;
+		tempNode[0].isLeaf = false;
+		tempNode[0].child[0] = tempRoot;
+
+		BTreeSplitChild(tempNode, 0, tempRoot);
+		BTreeInsertNonFull(tempNode, key);
+	}
+	else
+		BTreeInsertNonFull(tempRoot, key);
+}
 
 
 int main()
