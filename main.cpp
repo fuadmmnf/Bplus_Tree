@@ -66,6 +66,38 @@ void BTreeSplitChild(node *x, int iter, node *y)
 
 
 
+void BTreeInsertNonFull(node *x, int key)
+{
+	int n = x[0].keyCount;
+
+	if(x[0].isLeaf)
+	{
+		while(n>=0  &&  key < x[0].key[n])
+		{
+			x[0].key[n+1] = x[0].key[n];
+			n--;
+		}
+		x[0].key[n+1] = key;
+		x[0].keyCount++:	
+	}
+	else
+	{
+		while(n>=0  &&  x[0].key[n] > key)
+			n--;
+		n++;
+
+		if(x[0].child[n].keyCount == 2*t-1)
+		{
+			BTreeSplitChild(x, n, x[0].child[n]);
+			if(key > x[0].key[n])
+				n++;
+		}
+		BTreeInsertNonFull(x[0].child[n], key);
+	}
+}
+
+
+
 void BTreeInsert(int key)
 {
 	node *tempRoot = root;
