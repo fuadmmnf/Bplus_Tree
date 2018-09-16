@@ -5,6 +5,8 @@ using namespace std;
 
 struct node
 {
+    int pID=-1;
+    int nodeID;
 	int *key;
 	node **child;
 	bool isLeaf;
@@ -21,11 +23,17 @@ node* createNode()
 {
 	node *tempNode = new node[1];
 	//nodeQue.push(tempNode);
+	tempNode[0].nodeID = nodeNumber++;
 	tempNode[0].isLeaf = true;
 	tempNode[0].keyCount = 0;
 	tempNode[0].key = new int[2*t-1];
 	tempNode[0].child = new node*[2*t];
-	for(int i=0; i<2*t; i++) tempNode[0].child[i] = new node[1];
+	for(int i=0; i<2*t; i++)
+    {
+        tempNode[0].child[i] = new node[1];
+        (tempNode[0].child[i])[0].keyCount=0;
+        (tempNode[0].child[i])[0].nodeID = nodeNumber++;
+    }
 
 	return tempNode;
 }
@@ -49,7 +57,8 @@ void BTreeSplitChild(node *x, int iter, node *y)
 		for(int i=0; i<t; i++)
 		{
 			tempNode[0].child[i] = y[0].child[i+t];
-		 }
+        }
+        y[0].pID = tempNode[0].nodeID;
 	}
 
 	y[0].keyCount = t;
@@ -57,6 +66,7 @@ void BTreeSplitChild(node *x, int iter, node *y)
 	for(int i= x[0].keyCount+1 ; i > iter+1; i--)
 		x[0].child[i+1] = x[0].child[i];
 	x[0].child[iter+1] = tempNode;
+    tempNode[0].pID = x[0].nodeID;
 
 	for(int i = x[0].keyCount+1; i > iter; i--)
 		x[0].key[i+1] = x[0].key[i];
@@ -113,17 +123,23 @@ void BTreeInsert(node* currNode, int key)
 {
 	node *tempRoot = currNode;
 
-
 		if(tempRoot[0].keyCount == 2*t-1)
 		{
-			node *tempNode = createNode();
-			//nodeQue.push(tempNode);
-			root = tempNode;
-			tempNode[0].isLeaf = false;
-			tempNode[0].child[0] = tempRoot;
 
-			BTreeSplitChild(tempNode, 0, tempRoot);
-			BTreeInsertNonFull(tempNode, key);
+                if((tempRoot[0].child[2*t-1])[0].keyCount==0)
+                {
+
+                    node *tempNode = createNode();
+                    //nodeQue.push(tempNode);
+                    root = tempNode;
+                    tempNode[0].isLeaf = false;
+                    tempNode[0].child[0] = tempRoot;
+                    tempRoot[0].pID = tempNode[0].nodeID;
+                    BTreeSplitChild(tempNode, 0, tempRoot);
+                    BTreeInsertNonFull(tempNode, key);
+                }
+                else
+                    BTreeInsertNonFull(tempRoot, key);
 		}
 		else
 			BTreeInsertNonFull(tempRoot, key);
@@ -160,6 +176,7 @@ void searchKey(node* x, int key)
 
 void printTree(node *currNode)
 {
+    cout<<"Node ID: "<<currNode[0].nodeID<<endl<<"Parent ID: "<<currNode[0].pID<<endl;
 	for(int i=0; i<currNode[0].keyCount; i++)
 		cout<<currNode[0].key[i]<<" ";
     cout<<endl<<endl;
@@ -189,12 +206,15 @@ int main()
 	{
 		cin>>temp;
 		BTreeInsert(root, temp);
+		cout<<endl<<endl;
+	printTree(root);
 		//searchVal = make_pair(new , -1);
 		//searchKey(root, temp);
 		//cout<<searchVal.second<<endl;
 
 		//printf("\n\n\n\n");
+		cout<<endl<<endl<<endl;
 	}
-	printTree(root);
+
 	return 0;
 }
