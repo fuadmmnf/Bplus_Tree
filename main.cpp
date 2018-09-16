@@ -41,7 +41,7 @@ node* createNode()
 
 
 
-void BTreeSplitChild(node *x, int iter, node *y)
+void BTreeSplitChild(node *x, int iter, node *y, int key)
 {
 	node *tempNode = createNode();
 	tempNode[0].isLeaf = y[0].isLeaf;
@@ -54,6 +54,8 @@ void BTreeSplitChild(node *x, int iter, node *y)
 
 	if(!y[0].isLeaf)
 	{
+	    tempNode[0].key[t-1] = key;
+	    tempNode[0].keyCount++;
 		for(int i=0; i<t; i++)
 		{
 			tempNode[0].child[i] = y[0].child[i+t];
@@ -106,7 +108,7 @@ void BTreeInsertNonFull(node *x, int key)
 
 		if((x[0].child[n])[0].keyCount == 2*t-1)
 		{
-			BTreeSplitChild(x, n, x[0].child[n]);
+			BTreeSplitChild(x, n, x[0].child[n],key);
 			if(key > x[0].key[n])
 				n++;
 		}
@@ -126,20 +128,24 @@ void BTreeInsert(node* currNode, int key)
 		if(tempRoot[0].keyCount == 2*t-1)
 		{
 
-                if((tempRoot[0].child[2*t-1])[0].keyCount==0)
+                /* if((tempRoot[0].child[2*t-1])[0].keyCount==0)
                 {
-
+                */
                     node *tempNode = createNode();
                     //nodeQue.push(tempNode);
                     root = tempNode;
                     tempNode[0].isLeaf = false;
                     tempNode[0].child[0] = tempRoot;
                     tempRoot[0].pID = tempNode[0].nodeID;
-                    BTreeSplitChild(tempNode, 0, tempRoot);
+                    BTreeSplitChild(tempNode, 0, tempRoot,key);
                     BTreeInsertNonFull(tempNode, key);
+                //}
+               /* else if((tempRoot[0].child[2*t-1])[0].keyCount==2*t-1)
+                {
+
                 }
                 else
-                    BTreeInsertNonFull(tempRoot, key);
+                    BTreeInsertNonFull(tempRoot, key);*/
 		}
 		else
 			BTreeInsertNonFull(tempRoot, key);
@@ -184,7 +190,19 @@ void printTree(node *currNode)
 		if((currNode[0].child[i])[0].keyCount)
 			printTree(currNode[0].child[i]);
 }
+void ifLeafYet(node *currNode)
+{
+    if(currNode[0].isLeaf)
+        for(int i=0; i<2*t; i++)
+        {
+            if((currNode[0].child[i])[0].keyCount>0)
+            {
+                currNode[0].isLeaf = false;
+                ifLeafYet(currNode[0].child[i]);
+            }
+        }
 
+}
 
 
 
@@ -206,8 +224,10 @@ int main()
 	{
 		cin>>temp;
 		BTreeInsert(root, temp);
+
+        ifLeafYet(root);
 		cout<<endl<<endl;
-	printTree(root);
+        printTree(root);
 		//searchVal = make_pair(new , -1);
 		//searchKey(root, temp);
 		//cout<<searchVal.second<<endl;
