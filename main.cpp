@@ -67,30 +67,49 @@ void BTreeSplitChild(node *x, int iter, node *y)
 	if(!y[0].isLeaf)
 	{
 
-		for(int i=1; i<t; i++)
+
+		for(int i=0; i<t; i++)
 		{
 			tempNode[0].child[i] = y[0].child[i+t];
 			(y[0].child[i+t])[0].pID = tempNode[0].nodeID;
 			y[0].child[i+t] = createNode();
         }
-        //y[0].keyCount = t-1;
+        y[0].keyCount = t-1;
+        for(int i= x[0].keyCount+1 ; i > iter+1; i--)
+		{
+			x[0].child[i+1] = x[0].child[i];
+		}
+		x[0].child[iter+1] = tempNode;
+	    tempNode[0].pID = x[0].nodeID;
+
+		for(int i = x[0].keyCount+1; i > iter; i--)
+			x[0].key[i+1] = x[0].key[i];
+		x[0].key[iter] = y[0].key[t-1];
+
+		x[0].keyCount ++;
+
+
 	}
+	else
+	{
         y[0].keyCount = t;
 
-//ekhan porjonto dekhlam
 
-	for(int i= x[0].keyCount+1 ; i > iter+1; i--)
-	{
-		x[0].child[i+1] = x[0].child[i];
+        //ekhan porjonto dekhlam
+
+		for(int i= x[0].keyCount+1 ; i > iter+1; i--)
+		{
+			x[0].child[i+1] = x[0].child[i];
+		}
+		x[0].child[iter+1] = tempNode;
+	    tempNode[0].pID = x[0].nodeID;
+
+		for(int i = x[0].keyCount+1; i > iter; i--)
+			x[0].key[i+1] = x[0].key[i];
+		x[0].key[iter] = y[0].key[t];
+
+		x[0].keyCount ++;
 	}
-	x[0].child[iter+1] = tempNode;
-    tempNode[0].pID = x[0].nodeID;
-
-	for(int i = x[0].keyCount+1; i > iter; i--)
-		x[0].key[i+1] = x[0].key[i];
-	x[0].key[iter] = y[0].key[t];
-
-	x[0].keyCount ++;
 
 }
 
@@ -125,6 +144,7 @@ void BTreeInsertNonFull(node *x, int key)
 		if((x[0].child[n])[0].keyCount == 2*t-1)
 		{
 			BTreeSplitChild(x, n, x[0].child[n]);
+			(x[0].child[n])[0].isLeaf = false;
 			if(key > x[0].key[n])
 				n++;
 		}
