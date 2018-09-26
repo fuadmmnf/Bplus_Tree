@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define STR_MAX "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+#define STR_MAX "৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻"
 #define MAX 50
 
 
@@ -240,6 +240,7 @@ void splitNonLeaf(Block *curBlock){
 
 void insertNode(Block *curBlock, string val){
 
+
     for(int i=0; i<=curBlock->tNodes; i++){
         if(val < curBlock->value[i] && curBlock->childBlock[i]!=NULL){
             insertNode(curBlock->childBlock[i], val);
@@ -297,33 +298,87 @@ void print(vector < Block* > Blocks){
     }
 }
 
+bool keyfound ;
+void searchKey(Block *x, string key)
+{
+    if(x==rootBlock ) keyfound = false;
+
+
+    if(!keyfound)
+    {
+        for(int i=0; i<=x->tNodes; i++)
+        {
+            if(x->value[i] == key)
+            {
+                keyfound = true;
+                return;
+            } 
+            if(key < x->value[i] && x->childBlock[i]!=NULL)
+            {
+                searchKey(x->childBlock[i], key);
+               
+                return;
+            }
+    }
+    return;
+}
+
+
+
 int main(){
-   vector<string> input;// = {1,4,7,10,17,21,31,25,19,20,28,42};
+
+
+    const char* fileName = "input.txt";
+
+    //setlocale(LC_ALL, "");
+
+    vector<string> input;// = {1,4,7,10,17,21,31,25,19,20,28,42};
     // int num[] = {5,10,15,20,25,28,30,50,55,60,65,70,75,80,85,90,95};
 
-   vector<Block*> Blocks;
+    vector<Block*> Blocks;
+    ifstream myfile(fileName, ios::binary);
 
-    printf("Pointers: ");
-    scanf("%d", &numberOfPointers);
 
-    int inputNum;
-    printf("Input: ");
-    scanf("%d", &inputNum);
+    // wifstream wif(fileName);
+    // wif.imbue(locale(locale::empty(), new codecvt_utf8<wchar_t>));
+    // wstringstream wss;
+    // wss << wif.rdbuf();
+    // cout<<wss.str()<<endl<<endl;
+
+    // wstring wstr = readFile("input.txt");
+    // cout<<wstr<<endl;
+
+
+    fprintf(stderr,"Pointers: ");
+    cin>>numberOfPointers;
+
     int ch;
     int i = 0;
     int totalValues = 0;
     //input from file
     string str;
 
-    for(int i=0; i<inputNum; i++)
+    if(myfile.is_open())
     {
-        cin>>str;
-        input.push_back(str);
-        insertNode(rootBlock, input[i]);
-        Blocks.clear();
-        Blocks.push_back(rootBlock);
-        print(Blocks);
-        puts("");
+        while(myfile >> str)
+        {
+
+            // cout<<"read : "<<str<<endl;
+            insertNode(rootBlock, str);
+            Blocks.clear();
+            Blocks.push_back(rootBlock);
+            print(Blocks);
+            puts("");
+            totalValues++;
+        
+        }
+        // cout<<"Total words: "<<totalValues<<endl;
+        // Blocks.clear();
+        // Blocks.push_back(rootBlock);
+        // print(Blocks);
+        // puts("");
+
+        myfile.close();
     }
 
     return 0;
