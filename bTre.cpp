@@ -1,8 +1,9 @@
 #include<bits/stdc++.h>
+#include<time.h>
 using namespace std;
 
 #define STR_MAX "৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻৻"
-#define MAX 50
+#define MAX 100
 
 
 //number of pointers or number of child blocks [numberOfPointers = numberOfNodes + 1]
@@ -55,7 +56,7 @@ void splitLeaf(Block *curBlock){
         rightBlock->value[j] = curBlock->value[i];
         //and erase right-half values from curBlock to make it real leftBlock
         //so that it does not contain all values only contains left-half values
-        curBlock->value[i] = INT_MAX;
+        curBlock->value[i] = STR_MAX;
     }
     //for splitting the leaf blocks we copy the first item from the rightBlock to their parentBlock
     //and val contains that value
@@ -150,7 +151,7 @@ void splitNonLeaf(Block *curBlock){
         rightBlock->childBlock[j] = curBlock->childBlock[i];
         //erase the right-half values from curBlock to make it perfect leftBlock
         //which won't contain only left-half values and their children
-        curBlock->value[i] = INT_MAX;
+        curBlock->value[i] = STR_MAX;
         //erase all the right-half childBlocks from curBlock except the x one
         //because if left child has 3 nodes then it should have 4 childBlocks, so don't delete that child
         if(i!=x)curBlock->childBlock[i] = NULL;
@@ -161,7 +162,8 @@ void splitNonLeaf(Block *curBlock){
     string val = rightBlock->value[0];
     //just right-shift value[] and childBlock[] by one from rightBlock
     //to have no repeat of the first item for non-leaf Block
-    memcpy(&rightBlock->value, &rightBlock->value[1], sizeof(string)*(rightBlock->tNodes+1));
+    for(int k=0; k<(rightBlock->tNodes+1); k++)
+        rightBlock->value[k] = rightBlock->value[k+1];
     memcpy(&rightBlock->childBlock, &rightBlock->childBlock[1], sizeof(rootBlock)*(rightBlock->tNodes+1));
 
     //we reordered some values and positions so don't forget
@@ -302,13 +304,19 @@ bool keyfound ;
 void searchKey(Block *x, string key)
 {
     if(x==rootBlock ) keyfound = false;
-
+    bool isLeaf  = true;
 
     if(!keyfound)
     {
+    	for(int i=0; i<= x->tNodes; i++)
+    	{
+    		if(x->childBlock[i] != NULL)
+    			isLeaf = false;
+    	}
+
         for(int i=0; i<=x->tNodes; i++)
         {
-            if(x->value[i] == key)
+            if(isLeaf && x->value[i] == key)
             {
                 keyfound = true;
                 return;
@@ -319,6 +327,7 @@ void searchKey(Block *x, string key)
                
                 return;
             }
+        }
     }
     return;
 }
@@ -365,10 +374,7 @@ int main(){
 
             // cout<<"read : "<<str<<endl;
             insertNode(rootBlock, str);
-            Blocks.clear();
-            Blocks.push_back(rootBlock);
-            print(Blocks);
-            puts("");
+            
             totalValues++;
         
         }
@@ -377,9 +383,24 @@ int main(){
         // Blocks.push_back(rootBlock);
         // print(Blocks);
         // puts("");
-
+        Blocks.clear();
+        Blocks.push_back(rootBlock);
+        print(Blocks);
+        puts("");
         myfile.close();
+        exit(0);
     }
-
+    cout<<"Commense search: "<<endl;
+    clock_t s,f;
+    while(cin>>str)
+    {
+    	s = clock();
+    	searchKey(rootBlock,str);
+    	f = clock();
+    	cout<<"Time required: "<<f-s<<endl;
+    	if(keyfound)
+    		cout<<"Key found"<<endl;
+    	else cout<<"Not found" <<endl;
+    }
     return 0;
 }
